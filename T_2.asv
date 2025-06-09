@@ -1,0 +1,38 @@
+centroide_1 = [0,1];
+centroide_2 = [1,0];
+sigma = 1;
+
+cantidad_puntos = 100;
+conjunto_1 = sigma * randn(cantidad_puntos, 2) + centroide_1;
+conjunto_2 = sigma * randn(cantidad_puntos, 2) + centroide_2;
+
+figure;
+hold on;
+scatter(conjunto_1(:,1), conjunto_1(:,2), 15,  'filled')
+scatter(conjunto_2(:,1), conjunto_2(:,2), 15, 'filled')
+
+plot(centroide_1(1), centroide_1(2),'kx', 'MarkerSize', 12, 'LineWidth', 4);
+plot(centroide_2(1), centroide_2(2), 'kx', 'MarkerSize', 12, 'LineWidth', 4);
+
+legend('Grupo 1', 'Grupo 2', 'Centroides');
+xlabel('X'); ylabel('Y');
+title('Distribuciones Gaussianas en ℝ^2');
+axis equal;
+grid on;
+
+hold off;
+
+% Calculando las medias de cada conjunto
+media_con_1 = mean(conjunto_1);
+media_con_2 = mean(conjunto_2);
+
+% Calculando las matrices de covarianza para cada conjunto
+cov_con_1 = cov(conjunto_1);
+cov_con_2 = cov(conjunto_2);
+
+% Mostrando resultados
+disp('Media clase 1:'); disp(media_con_1);
+disp('Covarianza clase 1:'); disp(cov_con_1);
+disp('Media clase 2:'); disp(media_con_2);
+disp('Covarianza clase 2:'); disp(cov_con_2 ...
+    );
