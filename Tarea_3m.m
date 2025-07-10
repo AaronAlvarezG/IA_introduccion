@@ -4,11 +4,11 @@
 
 % Definir la ruta de la carpeta que contiene las imágenes
 % carpeta = 'C:\Users\harun\OneDrive\Documentos\25-P\IA_introduccion\DB_tornillos\';
-carpeta = 'C:\Users\Aaron\Documents\IA\DB_tornillos\';
-
+carpeta = 'C:\Users\Aaron\Documents\25-P\IA\DB_tornillos\';
 clases = {'Tornillo', 'Alcayata', 'Armella', 'Cola de pato', 'Rondana'};
 no_clases = length(clases);
 no_imagenes = 20;
+
 
 matriz_temp = [];
 matriz_imagenes = {}; 
@@ -35,7 +35,7 @@ for i=1 : no_clases
 end
 % <<<<<<<<<<<<<<<<<< a) <<<<<<<<<<<<<<<<<<<
 
-% b) Por clase, vista cada imagen como señal, calcular la media, 
+%% b) Por clase, vista cada imagen como señal, calcular la media, 
 % varianza y desviación estándar.
 media = zeros(no_clases,1);
 varianza = zeros(no_clases,1);
@@ -47,7 +47,7 @@ for c=1: no_clases
     desv_estandar(c) = mean(std(matriz_imagenes{c}, 0, 2));
 end
 
-% <<<<<<<<<<<<<<<<<< a) <<<<<<<<<<<<<<<<<<<
+%% <<<<<<<<<<<<<<<<<< a) <<<<<<<<<<<<<<<<<<<
 % c) Graficar los datos del paso anterior en una sola figura, 
 % indicando los valores por clase. Describa cómo son los datos 
 % por cada clase.
@@ -67,7 +67,7 @@ subplot(1,3,1); bar(media);    title('Media');        xticklabels(clases);
 subplot(1,3,2); bar(varianza); title('Varianza');     xticklabels(clases);
 subplot(1,3,3); bar(desv_estandar); title('Desv. Est.');   xticklabels(clases);
 
-% ------------------- ENERGÍA Y ENTROPÍA --------------------------------
+%% ------------------- ENERGÍA Y ENTROPÍA --------------------------------
 % d) Calcule la energía y la entropía por clase y de el valor promedio 
 % por clase. Graficar los valores.
 
@@ -174,3 +174,55 @@ fprintf('Precisión del clasificador: %.2f%%\n', precision_total * 100);
 disp('Matriz de confusión:');
 disp(conf_mat);
 
+
+
+
+
+
+%% Tratamiento para encontrar y aislar el objeo de interés
+
+
+matriz_temp = [];
+matriz_imagenes = {}; 
+for i=1 : no_clases
+    % Obtener la lista de archivos en la carpeta
+    direccion = strcat(carpeta, clases{i});
+    imagenes = dir(fullfile(direccion, '*.bmp'));
+    
+    matriz_temp =[];
+    % Iterar sobre cada archivo
+    for j = 1: no_imagenes
+        % Cargar la imagen actual
+        imagen = imread(fullfile(direccion, imagenes(j).name));
+        
+        % Paso 1: Convertir a escala de grises
+        if size(imagen, 3) == 3
+            img_gray = rgb2gray(imagen);
+        else
+            img_gray = imagen;
+        end
+        
+        % Paso 2: Binarizar y limpiar
+        bw = imcomplement(imbinarize(img_gray));
+        bw_clean = bwareaopen(bw, 500);
+        
+        % Paso 3: Extraer el objeto principal
+        props = regionprops(bw_clean, 'BoundingBox');
+        if ~isempty(props)
+            objeto = imcrop(img_gray, props(1).BoundingBox);
+        else
+            objeto = img_gray;  % fallback: usar toda la imagen si no se detecta nada
+        end
+
+        
+        % Bajar resolución
+        img_red = imresize(imagen, [32 32]);     
+        % Convertir la imagen en un vector fila
+        vector_fila = reshape(img_red, 1, []);
+        
+        % Agregar vector fila a una matriz
+        matriz_temp(j, :) = double(vector_fila);
+        
+    end
+    matriz_imagenes{end+1} = matriz_temp;
+end
