@@ -73,8 +73,9 @@ for i=1 : no_clases
     end
     matriz_imagenes{end+1} = matriz_temp;
 end
+%%
 mostrar_estadisticos(matriz_imagenes, no_clases, clases, no_imagenes);
-
+%%
 clasificador_bayes(matriz_imagenes, no_clases, no_imagenes);
 
 %%
@@ -120,9 +121,15 @@ function clasificador_bayes(matriz_imagenes, no_clases, no_imagenes )
     modelo = fitcdiscr(X_train, Y_train);
     Y_pred = predict(modelo, X_test);
     
-    % Evaluar el rendimiento
+   % Crear la matriz de confusión
     figure;
-    confusionchart(Y_test, Y_pred);
+    cm = confusionchart(Y_test, Y_pred);
+    
+    % Cambiar tamaños de fuente
+    cm.Title = 'Matriz de Confusión';
+    cm.FontSize = 30;                  % Cambia el tamaño de toda la fuente
+    cm.XLabel = 'Clase Predicha';
+    cm.YLabel = 'Clase Verdadera';
     conf_mat = confusionmat(Y_test, Y_pred);
     precision_total = sum(diag(conf_mat)) / sum(conf_mat(:));
     
@@ -132,6 +139,8 @@ end
 function mostrar_estadisticos(matriz, no_clases, clases, no_imagenes)
     %% b) Por clase, vista cada imagen como señal, calcular la media, 
     % varianza y desviación estándar.
+    tamanio_letra = 30;
+
     media = zeros(no_clases,1);
     varianza = zeros(no_clases,1);
     desv_estandar = zeros(no_clases,1);
@@ -145,21 +154,11 @@ function mostrar_estadisticos(matriz, no_clases, clases, no_imagenes)
     % c) Graficar los datos del paso anterior en una sola figura, 
     % indicando los valores por clase. Describa cómo son los datos 
     % por cada clase.
+        
     figure;
-    hold on;
-    bar(media, 'FaceColor', 'b');
-    errorbar(1:no_clases, media, desv_estandar, 'k', 'linestyle', 'none');
-    xticks(1:no_clases);
-    xticklabels(clases);
-    xlabel('Clases');
-    ylabel('Valores');
-    title('Media y Desviación Estándar por Clase');
-    hold off;
-    
-    figure;
-    subplot(1,3,1); bar(media);    title('Media');        xticklabels(clases);
-    subplot(1,3,2); bar(varianza); title('Varianza');     xticklabels(clases);
-    subplot(1,3,3); bar(desv_estandar); title('Desv. Est.');   xticklabels(clases);
+    subplot(1,3,1); bar(media);    title('Media', FontSize=tamanio_letra);        xticklabels(clases);  set(gca, 'FontSize', tamanio_letra);
+    subplot(1,3,2); bar(varianza); title('Varianza', FontSize=tamanio_letra);     xticklabels(clases);  set(gca, 'FontSize', tamanio_letra);
+    subplot(1,3,3); bar(desv_estandar); title('Desv. Est.', FontSize=tamanio_letra);   xticklabels(clases); set(gca, 'FontSize', tamanio_letra);
     
     %% ------------------- ENERGÍA Y ENTROPÍA --------------------------------
     % d) Calcule la energía y la entropía por clase y de el valor promedio 
@@ -182,8 +181,8 @@ function mostrar_estadisticos(matriz, no_clases, clases, no_imagenes)
     end
     
     figure;
-    subplot(1,2,1); bar(energia);  title('Energía por clase');  xticklabels(clases);
-    subplot(1,2,2); bar(entropia); title('Entropía por clase'); xticklabels(clases);
+    subplot(1,2,1); bar(energia);  title('Energía por clase', FontSize=tamanio_letra);  xticklabels(clases);set(gca, 'FontSize', tamanio_letra);
+    subplot(1,2,2); bar(entropia); title('Entropía por clase', FontSize=tamanio_letra); xticklabels(clases);set(gca, 'FontSize', tamanio_letra);
 end
 
 function [BW,maskedImage] = segmentAlcayata(X)
